@@ -9,6 +9,7 @@ A PyQt6 desktop application that bundles two data-analysis tools:
 - Unified tabbed interface with shared menus and status bar.
 - Supports both ad-hoc graphing and CAN decoding without leaving the app.
 - Streaming CAN decoder keeps memory usage low and writes partitioned CSVs when needed.
+- Parallel CAN0/CAN1 decoding with real-time progress feedback.
 - Charting backed by Matplotlib with multiple chart types, colour maps, and export options.
 
 ## Getting Started

@@ -35,6 +35,8 @@ class DecoderWorker(QThread):
 
     finished = pyqtSignal(list)
     failed = pyqtSignal(str)
+    progress = pyqtSignal(float)
+    message = pyqtSignal(str)
 
     def __init__(
         self,
@@ -59,6 +61,12 @@ class DecoderWorker(QThread):
         self._can1_output = can1_output
 
     def run(self) -> None:  # type: ignore[override]
+        def on_progress(fraction: float, note: Optional[str] = None) -> None:
+            fraction = max(0.0, min(1.0, float(fraction)))
+            self.progress.emit(fraction)
+            if note:
+                self.message.emit(note)
+
         try:
             if self._split_outputs:
                 assert self._can0_output and self._can1_output
@@ -69,6 +77,7 @@ class DecoderWorker(QThread):
                     include_bits=self._include_bits,
                     channel=self._channel,
                     row_limit=self._row_limit,
+                    progress_cb=on_progress,
                 )
             else:
                 assert self._single_output
@@ -78,6 +87,7 @@ class DecoderWorker(QThread):
                     include_bits=self._include_bits,
                     channel=self._channel,
                     row_limit=self._row_limit,
+                    progress_cb=on_progress,
                 )
         except Exception as exc:  # pragma: no cover - surfaced via UI
             self.failed.emit(str(exc))
@@ -99,6 +109,7 @@ class CanDecoderWidget(QWidget):
         self._bits_checkbox: QCheckBox
         self._xls_limit_checkbox: QCheckBox
         self._progress: QProgressBar
+        self._progress_label: QLabel
         self._log: QPlainTextEdit
 
         self._build_ui()
@@ -155,9 +166,13 @@ class CanDecoderWidget(QWidget):
         layout.addLayout(button_row)
 
         self._progress = QProgressBar()
-        self._progress.setRange(0, 1)
+        self._progress.setRange(0, 100)
         self._progress.setValue(0)
-        layout.addWidget(self._progress)
+        self._progress_label = QLabel("0%")
+        progress_row = QHBoxLayout()
+        progress_row.addWidget(self._progress)
+        progress_row.addWidget(self._progress_label)
+        layout.addLayout(progress_row)
 
         self._log = QPlainTextEdit()
         self._log.setReadOnly(True)
@@ -234,6 +249,7 @@ class CanDecoderWidget(QWidget):
         self._append_status("\nStarting decode...")
         self._append_status(log_summary)
         self._set_busy(True)
+        self._update_progress(0.0)
 
         self._worker = DecoderWorker(
             input_path=input_path,
@@ -245,6 +261,8 @@ class CanDecoderWidget(QWidget):
             can0_output=can0_output,
             can1_output=can1_output,
         )
+        self._worker.progress.connect(self._update_progress)
+        self._worker.message.connect(self._append_status)
         self._worker.finished.connect(self._on_decode_finished)
         self._worker.failed.connect(self._on_decode_failed)
         self._worker.finished.connect(self._clear_worker)
@@ -259,9 +277,14 @@ class CanDecoderWidget(QWidget):
         self._split_checkbox.setDisabled(busy)
         self._bits_checkbox.setDisabled(busy)
         self._xls_limit_checkbox.setDisabled(busy)
-        self._progress.setRange(0, 0 if busy else 1)
         if not busy:
-            self._progress.setValue(0)
+            self._update_progress(0.0)
+
+    def _update_progress(self, fraction: float) -> None:
+        fraction = max(0.0, min(1.0, float(fraction)))
+        percent = int(round(fraction * 100))
+        self._progress.setValue(percent)
+        self._progress_label.setText(f"{percent}%")
 
     def _append_status(self, message: str) -> None:
         self._log.appendPlainText(message)

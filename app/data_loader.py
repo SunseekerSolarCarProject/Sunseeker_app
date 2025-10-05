@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Iterable, List
 
 import pandas as pd
+import warnings
 
 # Common strings that should be treated as missing values.
 DEFAULT_NA_VALUES = {
@@ -108,10 +109,14 @@ def _coerce_datetime(series: pd.Series) -> pd.Series:
     if sample.empty:
         return series
 
-    converted = pd.to_datetime(sample, errors="coerce", infer_datetime_format=True)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message=".*infer format.*", category=UserWarning)
+        converted = pd.to_datetime(sample, errors="coerce", cache=True)
     success_ratio = converted.notna().mean()
     if success_ratio >= 0.7:
-        return pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*infer format.*", category=UserWarning)
+            return pd.to_datetime(series, errors="coerce", cache=True)
     return series
 
 
