@@ -26,7 +26,9 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller --noconfirm --clean --onefile --name Sunseeker main.py
+          pyinstaller --noconfirm --clean --onefile 
+          --add-data "app;app"
+          --name Sunseeker main.py
 
       - name: Package artifact
         shell: pwsh
