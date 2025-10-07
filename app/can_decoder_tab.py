@@ -22,7 +22,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from can_analyzer import (
+from .can_analyzer import (
     EXCEL_XLS_MAX_ROWS,
     EXCEL_XLSX_MAX_ROWS,
     decode_csv_one,

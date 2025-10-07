@@ -39,11 +39,11 @@ from .data_loader import (
     get_numeric_columns,
     load_csv,
 )
-from .models import DataFrameModel
-from .plotter import PlotCanvas, PlotConfig, PlotManager, SUPPORTED_CHARTS
-from .can_decoder_tab import CanDecoderWidget
-from .can_monitor import CanMonitorWidget
-from .telemetry_tab import TelemetryGeneratorWidget
+from models import DataFrameModel
+from plotter import PlotCanvas, PlotConfig, PlotManager, SUPPORTED_CHARTS
+from can_decoder_tab import CanDecoderWidget
+from can_monitor import CanMonitorWidget
+from telemetry_tab import TelemetryGeneratorWidget
 
 COLORMAPS = {
     "Default": None,
