@@ -10,6 +10,7 @@ A PyQt6 desktop application that bundles two data-analysis tools:
 - Supports both ad-hoc graphing and CAN decoding without leaving the app.
 - Streaming CAN decoder keeps memory usage low and writes partitioned CSVs when needed.
 - Parallel CAN0/CAN1 decoding with real-time progress feedback.
+- Live CAN monitor tab for sending frames and observing bus traffic in real time.
 - Charting backed by Matplotlib with multiple chart types, colour maps, and export options.
 
 ## Getting Started
@@ -24,7 +25,7 @@ A PyQt6 desktop application that bundles two data-analysis tools:
    ```
 
 ## Using the Application
-- Switch between **CSV Graph Explorer** and **CAN Decoder** via the tabs along the top of the window.
+- Switch between **CSV Graph Explorer**, **CAN Decoder**, and **CAN Monitor** via the tabs along the top of the window.
 - CSV Graph Explorer:
   - Click **Load CSV...** (or use File > Open CSV... / Ctrl+O) to import data.
   - Choose a chart type, configure axes and options, then click **Render Chart**.
@@ -33,6 +34,10 @@ A PyQt6 desktop application that bundles two data-analysis tools:
   - Select an input CAN log CSV and choose an output file or base name.
   - Pick channel filters, toggle bit expansion, and decide whether to split CAN0 / CAN1 outputs.
   - Press **Decode** to run the decoder; progress and file locations appear in the log panel.
+- CAN Monitor:
+  - Choose interface type (e.g. `socketcan`, `slcan`, `pcan`), channel, and bitrate, then press **Connect**.
+  - View incoming traffic in the receive table; use **Clear** to reset the view.
+  - Compose frames with ID/data fields, optionally mark extended ID or RTR, and click **Send Frame** to transmit.
 
 ## Notes
 - Histogram, bar, area, scatter, and line charts require numeric data; pie charts expect a single column selection.

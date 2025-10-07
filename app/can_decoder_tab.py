@@ -168,6 +168,7 @@ class CanDecoderWidget(QWidget):
         self._progress = QProgressBar()
         self._progress.setRange(0, 100)
         self._progress.setValue(0)
+        self._progress.setTextVisible(False)
         self._progress_label = QLabel("0%")
         progress_row = QHBoxLayout()
         progress_row.addWidget(self._progress)

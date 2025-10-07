@@ -13,10 +13,12 @@ class DataFrameModel(QAbstractTableModel):
     def __init__(self, dataframe: Optional[pd.DataFrame] = None) -> None:
         super().__init__()
         self._dataframe = dataframe if dataframe is not None else pd.DataFrame()
+        self._string_cache: dict[tuple[int, int], str] = {}
 
     def set_dataframe(self, dataframe: pd.DataFrame) -> None:
         self.beginResetModel()
         self._dataframe = dataframe.copy()
+        self._string_cache.clear()
         self.endResetModel()
 
     def rowCount(self, parent: QModelIndex | None = None) -> int:  # type: ignore[override]
@@ -31,12 +33,21 @@ class DataFrameModel(QAbstractTableModel):
             Qt.ItemDataRole.EditRole,
         ):
             return None
+        key = (index.row(), index.column())
+        if key in self._string_cache:
+            return self._string_cache[key]
+
         value = self._dataframe.iat[index.row(), index.column()]
         if pd.isna(value):
-            return ""
-        if isinstance(value, float):
-            return f"{value:.6g}"
-        return str(value)
+            result = ""
+        elif isinstance(value, float):
+            result = f"{value:.6g}"
+        else:
+            result = str(value)
+
+        if role == Qt.ItemDataRole.DisplayRole:
+            self._string_cache[key] = result
+        return result
 
     def headerData(
         self,

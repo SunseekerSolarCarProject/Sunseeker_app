@@ -42,6 +42,7 @@ from .data_loader import (
 from .models import DataFrameModel
 from .plotter import PlotCanvas, PlotConfig, PlotManager, SUPPORTED_CHARTS
 from .can_decoder_tab import CanDecoderWidget
+from .can_monitor import CanMonitorWidget
 
 COLORMAPS = {
     "Default": None,
@@ -67,7 +68,6 @@ class MainWindow(QMainWindow):
 
         self._build_ui()
         self._create_actions()
-        self._create_menu()
         self._create_status_bar()
         self._set_chart_ready(False)
 
@@ -102,12 +102,15 @@ class MainWindow(QMainWindow):
         self.can_decoder_widget = CanDecoderWidget(self)
         self.tab_widget.addTab(self.can_decoder_widget, "CAN Decoder")
 
+        self.can_monitor_widget = CanMonitorWidget(self)
+        self.tab_widget.addTab(self.can_monitor_widget, "CAN Monitor")
+
     def _create_controls_panel(self) -> QWidget:
         container = QWidget()
         layout = QVBoxLayout(container)
 
         info_label = QLabel(
-            "1. Load a CSV file using the buttons below or File > Open.\n"
+            "1. Use File > Open (Ctrl+O) to load a CSV file.\n"
             "2. Select the X and Y columns you want to compare.\n"
             "3. Click Render Chart, then Export Chart to save an image."
         )
@@ -117,10 +120,8 @@ class MainWindow(QMainWindow):
         file_buttons = QHBoxLayout()
         self.load_csv_button = QPushButton("Load CSV...")
         self.load_csv_button.clicked.connect(self._open_csv)
-
         self.export_button = QPushButton("Export Chart...")
         self.export_button.clicked.connect(self._export_chart)
-
         file_buttons.addWidget(self.load_csv_button)
         file_buttons.addWidget(self.export_button)
         layout.addLayout(file_buttons)
@@ -208,6 +209,12 @@ class MainWindow(QMainWindow):
 
         self.table_view = QTableView()
         self.table_view.setModel(self.table_model)
+        self.table_view.setAlternatingRowColors(True)
+        self.table_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.table_view.setWordWrap(False)
+        self.table_view.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.table_view.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.table_view.horizontalHeader().setStretchLastSection(True)
         tab_widget.addTab(self.table_view, "Data Table")
 
@@ -218,21 +225,17 @@ class MainWindow(QMainWindow):
         self.open_action = QAction("Open CSV...", self)
         self.open_action.setShortcut(QKeySequence("Ctrl+O"))
         self.open_action.triggered.connect(self._open_csv)
+        self.addAction(self.open_action)
 
         self.export_plot_action = QAction("Export Chart...", self)
         self.export_plot_action.setShortcut(QKeySequence("Ctrl+S"))
         self.export_plot_action.triggered.connect(self._export_chart)
+        self.addAction(self.export_plot_action)
 
         self.exit_action = QAction("Exit", self)
         self.exit_action.setShortcut(QKeySequence("Ctrl+Q"))
         self.exit_action.triggered.connect(self.close)
-
-    def _create_menu(self) -> None:
-        file_menu = self.menuBar().addMenu("&File")
-        file_menu.addAction(self.open_action)
-        file_menu.addAction(self.export_plot_action)
-        file_menu.addSeparator()
-        file_menu.addAction(self.exit_action)
+        self.addAction(self.exit_action)
 
     def _create_status_bar(self) -> None:
         status = QStatusBar(self)
