@@ -11,6 +11,7 @@ A PyQt6 desktop application that bundles two data-analysis tools:
 - Streaming CAN decoder keeps memory usage low and writes partitioned CSVs when needed.
 - Parallel CAN0/CAN1 decoding with real-time progress feedback.
 - Live CAN monitor tab for sending frames and observing bus traffic in real time.
+- Standalone telemetry generator script for producing randomised CAN232-style payloads.
 - Charting backed by Matplotlib with multiple chart types, colour maps, and export options.
 
 ## Getting Started
@@ -38,6 +39,8 @@ A PyQt6 desktop application that bundles two data-analysis tools:
   - Choose interface type (e.g. `socketcan`, `slcan`, `pcan`), channel, and bitrate, then press **Connect**.
   - View incoming traffic in the receive table; use **Clear** to reset the view.
   - Compose frames with ID/data fields, optionally mark extended ID or RTR, and click **Send Frame** to transmit.
+- Telemetry generator:
+  - Run `python telemetry_generator.py --port COM3` (adjusting port/baud/endianness as needed) to stream synthetic CAN232-style blocks for parser testing.
 
 ## Notes
 - Histogram, bar, area, scatter, and line charts require numeric data; pie charts expect a single column selection.

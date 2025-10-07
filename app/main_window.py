@@ -43,6 +43,7 @@ from .models import DataFrameModel
 from .plotter import PlotCanvas, PlotConfig, PlotManager, SUPPORTED_CHARTS
 from .can_decoder_tab import CanDecoderWidget
 from .can_monitor import CanMonitorWidget
+from .telemetry_tab import TelemetryGeneratorWidget
 
 COLORMAPS = {
     "Default": None,
@@ -104,6 +105,9 @@ class MainWindow(QMainWindow):
 
         self.can_monitor_widget = CanMonitorWidget(self)
         self.tab_widget.addTab(self.can_monitor_widget, "CAN Monitor")
+
+        self.telemetry_widget = TelemetryGeneratorWidget(self)
+        self.tab_widget.addTab(self.telemetry_widget, "Telemetry Generator")
 
     def _create_controls_panel(self) -> QWidget:
         container = QWidget()

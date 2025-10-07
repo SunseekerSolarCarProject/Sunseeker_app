@@ -261,8 +261,8 @@ class Can232ReaderThread(QThread):
         self.wait(1500)
 
 
-MODE_PYTHON_CAN = "python-can bus"
 MODE_CAN232 = "CAN232 (serial)"
+MODE_PYTHON_CAN = "python-can bus"
 
 
 class CanMonitorWidget(QWidget):
@@ -277,7 +277,7 @@ class CanMonitorWidget(QWidget):
         self._reader: Optional[CanReceiverThread] = None
         self._serial: Optional["serial.Serial"] = None  # type: ignore[name-defined]
         self._can232_thread: Optional[Can232ReaderThread] = None
-        self._current_mode: str = MODE_PYTHON_CAN
+        self._current_mode: str = MODE_CAN232
 
         self._mode_combo: QComboBox
         self._python_group: QGroupBox
@@ -321,6 +321,7 @@ class CanMonitorWidget(QWidget):
         self._rtr_checkbox: QCheckBox
 
         self._build_ui()
+        self._current_mode = self._mode_combo.currentText()
         self._set_python_can_state(False)
         self._set_can232_state(False)
         self._update_mode_visibility()
@@ -338,7 +339,7 @@ class CanMonitorWidget(QWidget):
         mode_row = QHBoxLayout()
         mode_row.addWidget(QLabel("Connection mode"))
         self._mode_combo = QComboBox()
-        self._mode_combo.addItems([MODE_PYTHON_CAN, MODE_CAN232])
+        self._mode_combo.addItems([MODE_CAN232, MODE_PYTHON_CAN])
         self._mode_combo.currentTextChanged.connect(self._on_mode_changed)
         mode_row.addWidget(self._mode_combo, 1)
         layout.addLayout(mode_row)
@@ -354,7 +355,7 @@ class CanMonitorWidget(QWidget):
         py_form.addRow("Channel", self._channel_edit)
 
         self._bitrate_combo = QComboBox()
-        self._bitrate_combo.addItems(["", "125000", "250000", "500000", "1000000"])
+        self._bitrate_combo.addItems(["2400", "9600", "19200", "38400", "125000", "250000", "500000", "1000000"])
         self._bitrate_combo.setEditable(True)
         self._bitrate_combo.setCurrentText("500000")
         py_form.addRow("Bitrate", self._bitrate_combo)
